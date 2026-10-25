@@ -1,0 +1,6 @@
+data/staging/
+data/community-questions.ts
+data/sample.png
+data/update-status.json
+node_modules/
+*.log
