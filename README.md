@@ -21,6 +21,8 @@ Máy chủ chỉ lắng nghe trên 127.0.0.1. Đây là ứng dụng cục bộ,
 
 ## Tính năng
 
+Giao diện tự chuyển sang bố cục điện thoại và máy tính bảng dọc khi chiều rộng từ 900px trở xuống: thanh điều hướng đáy, menu trượt, vùng chạm tối thiểu 44px và ô nhập chữ 16px. Màn hình thi có đồng hồ cố định khi cuộn, bảng số câu có thể mở/thu gọn và tự đưa câu vừa chọn vào vùng đọc. Giao diện có khoảng đệm cho vùng tai thỏ/thanh Home và hỗ trợ giảm chuyển động theo cài đặt thiết bị.
+
 - **Lý thuyết:** phân biệt 5 nhóm biển báo; 46 biển phổ biến có hình SVG dựng lại, ý nghĩa, lưu ý dễ nhầm và đánh dấu đã học. Ngân hàng 600 câu chia 6 chương, có hình minh họa gốc, tìm kiếm và luyện từng câu.
 - **Hướng dẫn và mẹo:** lộ trình học và 12 bài hướng dẫn ghi nhớ dựa trên quy tắc.
 - **Thi trắc nghiệm:** tùy chỉnh 1–600 câu, 1–300 phút, chọn chương hoặc chỉ câu điểm liệt. Thi xem đáp án sau khi nộp, hoặc luyện từng câu rồi kiểm tra đáp án. Tự nộp khi hết giờ, đánh dấu xem lại, bảng điều hướng câu, khôi phục khi tải lại trang nếu phiên máy chủ còn chạy.
