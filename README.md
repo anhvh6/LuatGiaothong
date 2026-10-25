@@ -52,7 +52,7 @@ Bấm **Cập nhật dữ liệu** trong ứng dụng. Máy chủ tải lại ng
 Nếu PDF thay đổi, cần Python và pdfplumber để trích xuất:
 
 ```powershell
-python -m pip install -r requirements.txt
+python -m pip install -r scripts/requirements.txt
 ```
 
 Máy hiện tại tự tìm Python trong runtime Codex; có thể cấu hình đường dẫn Python khác bằng biến môi trường `PYTHON_BIN`. Trường hợp PDF chưa thay đổi thì không cần Python.
@@ -81,3 +81,26 @@ Kiểm tra toàn vẹn 600 câu/đáp án/hình, danh sách điểm liệt, chia
 - `scripts/extract_pdf.py`: bộ trích xuất dữ liệu tái chạy được.
 
 Lưu ý: phiên làm bài nằm trong RAM máy chủ. Khởi động lại máy chủ sẽ mất bài đang làm; lịch sử đã nộp vẫn còn trong trình duyệt.
+
+## Triển khai lên Vercel từ GitHub
+
+Đây là ứng dụng **Node.js**, không phải Python. Tệp Python chỉ dùng để trích xuất câu hỏi ở localhost; phụ thuộc của công cụ này nằm trong `scripts/requirements.txt` để tránh nhận diện nhầm runtime.
+
+Khi import kho GitHub, chọn:
+
+- **Framework Preset: Other**, không chọn Python.
+- **Root Directory:** thư mục gốc kho, để trống hoặc `.`.
+- **Build Command:** `npm run build:vercel` (đã khai báo trong `vercel.json`).
+- **Output Directory:** `public` (đã khai báo trong `vercel.json`).
+- **Node.js:** 22.x theo `package.json`.
+- **Production Branch:** `master`. Triển khai commit mới nhất; không Redeploy lại riêng commit `667a848` đang lỗi.
+
+`api/handler.mjs` xuất HTTP handler cho Vercel Functions. `vercel.json` đặt `framework: null`, cấu hình build, đóng gói ngân hàng câu hỏi và chuyển các đường dẫn `/api/*` tới handler. Giao diện, hình ảnh và PDF gốc được phục vụ dưới dạng tệp tĩnh; API trả chuyển hướng cho PDF để tránh trả toàn bộ PDF qua Function.
+
+Vercel không dùng Map trong RAM để giữ phiên: trạng thái bài làm được mã hóa AES-256-GCM, trả về trình duyệt dưới dạng token và gửi lại qua body của các yêu cầu API. Đáp án đúng vẫn được giữ ở máy chủ cho tới khi kiểm tra hoặc nộp bài. Nhờ đó, bài làm có thể tiếp tục khi yêu cầu tiếp theo chạy ở instance khác. Đây là công cụ luyện tập, không phải nền tảng sát hạch chống gian lận.
+
+Build sinh khóa riêng trong `.build/session-key`; khóa này chỉ nằm trong gói Function, không nằm trong `public` hoặc Git. Không cần điền biến môi trường để bắt đầu. Nếu muốn giữ phiên qua nhiều lần redeploy, có thể tự cấu hình **SESSION_SECRET** ngẫu nhiên dài ít nhất 32 ký tự trong Vercel Environment Variables. Nếu không cấu hình, mỗi bản triển khai có khóa mới và bài đang làm có thể cần tạo lại. Lịch sử đã nộp vẫn nằm trong localStorage của cùng địa chỉ web.
+
+**Cập nhật dữ liệu trên Vercel:** nút đổi thành *Kiểm tra dữ liệu*: tải PDF nguồn, đối chiếu SHA-256 và thông báo có thay đổi hay không, không ghi tệp hoặc chạy Python trên Function. Khi có tài liệu mới, chạy `npm run update` ở localhost, kiểm chứng nội dung, commit và push dữ liệu mới lên GitHub để Vercel triển khai lại. Luồng cập nhật đầy đủ ở localhost được giữ nguyên.
+
+Kiểm tra chuẩn bị bản triển khai tại máy: `npm run build:vercel`. Kiểm tra tự động gồm cả phiên bài làm giữa các instance độc lập, token bị sửa, hết giờ, PDF tĩnh và cập nhật chỉ kiểm tra nguồn.
